@@ -58,7 +58,10 @@ if (isset($_FILES['file'])) {
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>sql split</title>
+	<title>.sql split</title>
+	<meta name="description" content="Split one big .sql file into several smaller .sql files">
+	<meta name="keywords" content="sql,split,smaller,part">
+	<meta name="author" content="Vladimir Barbarosh">
 	<link href="lib/bootstrap-3.2.0-dist/css/bootstrap.min.css" type="text/css" rel="stylesheet">
 	<link href="cover.css" type="text/css" rel="stylesheet">
 </head>
