@@ -58,7 +58,7 @@ if (isset($_FILES['file'])) {
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>.sql split</title>
+	<title>.sql split &mdash; Split .sql file into several parts</title>
 	<meta name="description" content="Split one big .sql file into several smaller .sql files">
 	<meta name="keywords" content="sql,split,smaller,part">
 	<meta name="author" content="Vladimir Barbarosh">
@@ -103,8 +103,9 @@ if (isset($_FILES['file'])) {
 <script type="text/javascript">
 jQuery(function ($) {
 
-	$('#file').change(function () {
+	$(document).on('change', '#file', function () {
 		$('#form').submit();
+		$('#file').replaceWith($('#file').clone());
 	});
 
 	$('#select_sql_file').click(function (event) {

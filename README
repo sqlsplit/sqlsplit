@@ -1,4 +1,13 @@
-w***_app_sql_split: split .sql file into several parts
+w390_app_sql_split: split .sql file into several parts
 ======================================================
 
 Split .sql file into several parts
+
+Credits
+=======
+
+Bootstrap
+http://getbootstrap.com
+
+Cover template for Bootstrap
+http://getbootstrap.com/examples/cover
