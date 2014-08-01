@@ -1,5 +1,5 @@
-w390_app_sql_split: split .sql file into several parts
-======================================================
+sqlsplit: split .sql file into several parts
+============================================
 
 Split .sql file into several parts
 
