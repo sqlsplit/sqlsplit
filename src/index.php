@@ -75,9 +75,6 @@ if (isset($_FILES['file'])) {
 		<div class="masthead clearfix">
 			<div class="inner">
 				<h3 class="masthead-brand">.sql split</h3>
-				<ul class="nav masthead-nav">
-					<li><a href="mailto:vladimir.barbarosh@gmail.com?subject=.sql+split">Contact</a></li>
-				</ul>
 			</div>
 		</div>
 
@@ -89,7 +86,7 @@ if (isset($_FILES['file'])) {
 
 		<div class="mastfoot">
 			<div class="inner">
-				<p><a href="https://github.com/sqlsplit/sqlsplit">source code</a></p>
+				<p><a href="https://github.com/sqlsplit/sqlsplit">source code</a> | <a href="http://sqlsplit.uservoice.com">feedback</a></p>
 			</div>
 		</div>
 
