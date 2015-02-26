@@ -50,3 +50,12 @@ function distribute($value, $parts)
 	}
 	return $a;
 }
+
+function bind($cb)
+{
+    $args = func_get_args();
+    array_shift($args);
+    return function () use ($cb, $args) {
+        return call_user_func_array($cb, $args);
+    };
+}

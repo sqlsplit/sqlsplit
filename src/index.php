@@ -4,29 +4,52 @@ include 'helper.php';
 
 if (isset($_FILES['file'])) {
 
+    $free_resources = array();
+
 	$temp_dir = sys_get_temp_dir();
-	$part_prefix = basename($_FILES['file']['name']);
+	$part_prefix = basename($_FILES['file']['name'], '.zip');
 	$total_size = filesize($_FILES['file']['tmp_name']);
 
 	$stmt = array();
 	$part = array();
 
+    $fp = false;
+    $zip_in = new ZipArchive();
+    if ($zip_in->open($_FILES['file']['tmp_name']) === true) {
+        $fp = $zip_in->getStream($zip_in->getNameIndex(0));
+        if ($fp === false) {
+            $zip_in->close();
+        }
+        else {
+            $free_resources[] = bind('fclose', $fp);
+            $free_resources[] = bind(array($zip_in, 'close'));
+        }
+    }
+    else {
+        // trigger_error('$zip->open failed: '.$zip->getStatusString(), E_USER_ERROR);
+    }
+
+    if ($fp === false) {
+        $fp = fopen($_FILES['file']['tmp_name'], 'r');
+        $free_resources[] = bind('fclose', $fp);
+    }
+
 	// 1.
 	//
 	//  big file into statements
-	$fp = fopen($_FILES['file']['tmp_name'], 'r');
 	while (($line = fgets($fp)) !== false) {
 		if (count($stmt) == 0 || strpos($line, 'INSERT INTO') === 0) {
 			$stmt[] = $stmt_file = tempnam($temp_dir, 'stmt');
+            $free_resources[] = bind('unlink', $stmt_file);
 		}
 		file_put_contents($stmt_file, $line, FILE_APPEND);
 	}
-	fclose($fp);
 
 	// 2. Join statements into Nth files
 	$stmt_file = reset($stmt);
 	foreach (distribute($total_size, $_POST['parts']) as $part_index => $part_size) {
 		$part[] = $part_file = tempnam($temp_dir, 'part');
+        $free_resources[] = bind('unlink', $part_file);
 		for ($written = 0; $stmt_file && $written < $part_size; $written += filesize($stmt_file), $stmt_file = next($stmt)) {
 			file_put_contents($part_file, file_get_contents($stmt_file), FILE_APPEND);
 		}
@@ -34,17 +57,18 @@ if (isset($_FILES['file'])) {
 
 	// 3. Add all parts into archive
 	$zip_file = tempnam($temp_dir, 'zip');
-	$zip = new ZipArchive();
-	$zip->open($zip_file);
+	$zip_out = new ZipArchive();
+    $zip_out->open($zip_file);
 	foreach ($part as $part_index => $part_file) {
 		$part_no = $part_index + 1;
-		$zip->addFile($part_file, "part-$part_no.sql");
+        $zip_out->addFile($part_file, "part-$part_no.sql");
 	}
-	$zip->close();
+    $zip_out->close();
 
 	// 4. Cleanup
-	array_map('unlink', $stmt);
-	array_map('unlink', $part);
+	// array_map('unlink', $stmt);
+	// array_map('unlink', $part);
+    array_map('call_user_func', $free_resources);
 
 	header('Content-Type:  application/zip');
 	header('Content-Length: '.filesize($zip_file));
@@ -84,11 +108,11 @@ if (isset($_FILES['file'])) {
 		<form id="form" enctype="multipart/form-data" method="POST" class="inner cover">
             <input type="file" name="file" id="file" class="hidden">
             <h1 class="cover-heading">
-                <label style="font-weight: normal;">Split .sql file into <input type="text" name="parts" value="5"> parts</label>
+                <label style="font-weight: normal;">Split .sql<span class="text-muted">[.zip]</span> file into <input type="text" name="parts" value="5"> parts</label>
             </h1>
             <br/>
 			<p class="lead">
-                <a id="select_sql_file" href="#" class="btn btn-lg btn-default">Select .sql file</a>
+                <a id="select_sql_file" href="#" class="btn btn-lg btn-default">Select a file</a>
             </p>
 		</form>
 
