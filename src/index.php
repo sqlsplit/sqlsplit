@@ -11,7 +11,9 @@ if (isset($_FILES['file'])) {
 	$stmt = array();
 	$part = array();
 
-	// 1. Split big file into statements
+	// 1.
+	//
+	//  big file into statements
 	$fp = fopen($_FILES['file']['tmp_name'], 'r');
 	while (($line = fgets($fp)) !== false) {
 		if (count($stmt) == 0 || strpos($line, 'INSERT INTO') === 0) {
@@ -63,7 +65,8 @@ if (isset($_FILES['file'])) {
 	<meta name="keywords" content="sql,split,smaller,part">
 	<meta name="author" content="Vladimir Barbarosh">
 	<link href="lib/bootstrap-3.2.0-dist/css/bootstrap.min.css" type="text/css" rel="stylesheet">
-	<link href="cover.css" type="text/css" rel="stylesheet">
+	<link href="css/cover.css" type="text/css" rel="stylesheet">
+	<link href="css/bootstrap.css" type="text/css" rel="stylesheet">
 </head>
 <body>
 
@@ -79,9 +82,14 @@ if (isset($_FILES['file'])) {
 		</div>
 
 		<form id="form" enctype="multipart/form-data" method="POST" class="inner cover">
-			<h1 class="cover-heading">Split .sql file into <input type="text" name="parts" value="5"> parts</h1>
-			<p class="lead"><a id="select_sql_file" href="#" class="btn btn-lg btn-default">Select .sql file</a></p>
-			<input type="file" name="file" id="file" class="hidden">
+            <input type="file" name="file" id="file" class="hidden">
+            <h1 class="cover-heading">
+                <label style="font-weight: normal;">Split .sql file into <input type="text" name="parts" value="5"> parts</label>
+            </h1>
+            <br/>
+			<p class="lead">
+                <a id="select_sql_file" href="#" class="btn btn-lg btn-default">Select .sql file</a>
+            </p>
 		</form>
 
 		<div class="mastfoot">
