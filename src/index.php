@@ -21,6 +21,8 @@ if (isset($_FILES['file'])) {
             $zip_in->close();
         }
         else {
+            $stat = $zip_in->statIndex(0);
+            $total_size = $stat['size'];
             $free_resources[] = bind('fclose', $fp);
             $free_resources[] = bind(array($zip_in, 'close'));
         }
