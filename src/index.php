@@ -3,82 +3,48 @@
 include 'helper.php';
 
 if (isset($_FILES['file'])) {
+    call_user_func(function () {
 
-    $free_resources = array();
+        $free_resources = array();
 
-	$temp_dir = sys_get_temp_dir();
-	$part_prefix = basename($_FILES['file']['name'], '.zip');
-	$total_size = filesize($_FILES['file']['tmp_name']);
+        $file_name = basename($_FILES['file']['name'], '.zip');
+        $file_size = filesize($_FILES['file']['tmp_name']);
+        $parts = $_POST['parts'];
 
-	$stmt = array();
-	$part = array();
-
-    $fp = false;
-    $zip_in = new ZipArchive();
-    if ($zip_in->open($_FILES['file']['tmp_name']) === true) {
-        $fp = $zip_in->getStream($zip_in->getNameIndex(0));
-        if ($fp === false) {
-            $zip_in->close();
+        $fp = false;
+        $zip = new ZipArchive();
+        if ($zip->open($_FILES['file']['tmp_name']) === true) {
+            $fp = $zip->getStream($zip->getNameIndex(0));
+            if ($fp === false) {
+                $zip->close();
+            }
+            else {
+                $stat = $zip->statIndex(0);
+                $file_size = $stat['size'];
+                $free_resources[] = bind('fclose', $fp);
+                $free_resources[] = bind(array($zip, 'close'));
+            }
         }
         else {
-            $stat = $zip_in->statIndex(0);
-            $total_size = $stat['size'];
-            $free_resources[] = bind('fclose', $fp);
-            $free_resources[] = bind(array($zip_in, 'close'));
+            // trigger_error('$zip->open failed: '.$zip->getStatusString(), E_USER_ERROR);
         }
-    }
-    else {
-        // trigger_error('$zip->open failed: '.$zip->getStatusString(), E_USER_ERROR);
-    }
 
-    if ($fp === false) {
-        $fp = fopen($_FILES['file']['tmp_name'], 'r');
-        $free_resources[] = bind('fclose', $fp);
-    }
+        if ($fp === false) {
+            $fp = fopen($_FILES['file']['tmp_name'], 'r');
+            $free_resources[] = bind('fclose', $fp);
+        }
 
-	// 1.
-	//
-	//  big file into statements
-	while (($line = fgets($fp)) !== false) {
-		if (count($stmt) == 0 || strpos($line, 'INSERT INTO') === 0) {
-			$stmt[] = $stmt_file = tempnam($temp_dir, 'stmt');
-            $free_resources[] = bind('unlink', $stmt_file);
-		}
-		file_put_contents($stmt_file, $line, FILE_APPEND);
-	}
+        $zip_file = sql_split($fp, $file_size, $parts);
+        $free_resources[] = bind('unlink', $zip_file);
 
-	// 2. Join statements into Nth files
-	$stmt_file = reset($stmt);
-	foreach (distribute($total_size, $_POST['parts']) as $part_index => $part_size) {
-		$part[] = $part_file = tempnam($temp_dir, 'part');
-        $free_resources[] = bind('unlink', $part_file);
-		for ($written = 0; $stmt_file && $written < $part_size; $written += filesize($stmt_file), $stmt_file = next($stmt)) {
-			file_put_contents($part_file, file_get_contents($stmt_file), FILE_APPEND);
-		}
-	}
+        header('Content-Type:  application/zip');
+        header('Content-Length: '.filesize($zip_file));
+        header("Content-Disposition: attachment; filename=\"$file_name.zip\"");
+        echo file_get_contents($zip_file);
 
-	// 3. Add all parts into archive
-	$zip_file = tempnam($temp_dir, 'zip');
-	$zip_out = new ZipArchive();
-    $zip_out->open($zip_file);
-	foreach ($part as $part_index => $part_file) {
-		$part_no = $part_index + 1;
-        $zip_out->addFile($part_file, "part-$part_no.sql");
-	}
-    $zip_out->close();
-
-	// 4. Cleanup
-	// array_map('unlink', $stmt);
-	// array_map('unlink', $part);
-    array_map('call_user_func', $free_resources);
-
-	header('Content-Type:  application/zip');
-	header('Content-Length: '.filesize($zip_file));
-	header("Content-Disposition: attachment; filename=\"$part_prefix.zip\"");
-	echo file_get_contents($zip_file);
-
-	unlink($zip_file);
-	exit;
+        array_map('call_user_func', $free_resources);
+        exit;
+    });
 }
 
 ?>
