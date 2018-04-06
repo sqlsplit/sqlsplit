@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+# http://www.gnu.org/software/bash/manual/bash.html#The-Set-Builtin
+set -o nounset  # Treat unset variables as an error when substituting
+set -o errexit  # Exit immediately if a command exits with a non-zero status
+set -o pipefail # Status code of a pipeline will be the status code of first failed command in it or 0
+
+script=`realpath $0`
+scriptdir=`dirname $script`
+scriptname=`basename $script`
+
+# https://unix.stackexchange.com/a/22876/121657
+# Configuration file '/etc/apache2/sites-available/000-default.conf'
+#  ==> File on system created by you or by a script.
+#  ==> File also in package provided by package maintainer.
+#  ==> Keeping old config file as default.
+apt-get -y -o 'Dpkg::Options::=--force-confdef' install \
+    apache2 libapache2-mod-php \
+    php-{cli,mysql,curl,gd,json,xml,mbstring,zip}
+
+a2enmod rewrite
+
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# display_errors = on
+# error_reporting = E_ALL|E_STRICT
+# upload_max_filesize = 250M
+# post_max_size = 1024M
+# date.timezone = UTC
+sed /etc/php/*/apache2/php.ini -i -r \
+	-e 's:^(\s*display_errors\s*=\s*).*$:\1on:' \
+	-e 's:^(\s*error_reporting\s*=\s*).*$:\1E_ALL|E_STRICT:' \
+	-e 's:^(\s*upload_max_filesize\s*=\s*).*$:\1250M:' \
+	-e 's:^(\s*post_max_size\s*=\s*).*$:\11024M:' \
+	-e 's:^(\s*memory_limit\s*=\s*).*$:\11024M:' \
+	-e 's:^(;)?(\s*date.timezone\s*=\s*).*$:\2UTC:'
+
+echo
+
+tee /etc/apache2/sites-available/000-default.conf << EOF
+# http://example.test
+<VirtualHost *:80>
+	# ServerName example.test
+	# ServerAlias *.example.test
+	DocumentRoot /www/public
+</VirtualHost>
+
+<Directory /www/public>
+	Options Indexes FollowSymLinks
+	AllowOverride All
+	Require all granted
+</Directory>
+
+# https://example.test
+# <VirtualHost *:443>
+# 	SSLEngine On
+# 	SSLCertificateFile /etc/ssl/localcerts/apache.pem
+# 	SSLCertificateKeyFile /etc/ssl/localcerts/apache.key
+# 	ServerName example.test
+# 	ServerAlias *.example.test
+# 	DocumentRoot /www/public
+# </VirtualHost>
+EOF

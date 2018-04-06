@@ -1,5 +1,10 @@
 Split .sql file into several parts
 
+## Using Docker Container
+
+    $ bin/build
+    $ bin/run
+
 ## References
 
 * [Bootstrap](http://getbootstrap.com)
