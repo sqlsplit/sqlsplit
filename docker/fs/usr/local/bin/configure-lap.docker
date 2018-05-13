@@ -10,6 +10,9 @@ script=`realpath $0`
 scriptdir=`dirname $script`
 scriptname=`basename $script`
 
+# https://serverfault.com/a/227194/323502
+export DEBIAN_FRONTEND=noninteractive
+
 # https://unix.stackexchange.com/a/22876/121657
 # Configuration file '/etc/apache2/sites-available/000-default.conf'
 #  ==> File on system created by you or by a script.
