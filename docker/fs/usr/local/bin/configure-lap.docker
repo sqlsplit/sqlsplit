@@ -34,8 +34,8 @@ curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin
 sed /etc/php/*/apache2/php.ini -i -r \
 	-e 's:^(\s*display_errors\s*=\s*).*$:\1on:' \
 	-e 's:^(\s*error_reporting\s*=\s*).*$:\1E_ALL|E_STRICT:' \
-	-e 's:^(\s*upload_max_filesize\s*=\s*).*$:\1250M:' \
-	-e 's:^(\s*post_max_size\s*=\s*).*$:\11024M:' \
+	-e 's:^(\s*upload_max_filesize\s*=\s*).*$:\12048M:' \
+	-e 's:^(\s*post_max_size\s*=\s*).*$:\12048M:' \
 	-e 's:^(\s*memory_limit\s*=\s*).*$:\11024M:' \
 	-e 's:^(;)?(\s*date.timezone\s*=\s*).*$:\2UTC:'
 
