@@ -3,16 +3,16 @@
  */
 
 /* Links */
-a,
-a:focus,
-a:hover {
+.site-wrapper a,
+.site-wrapper a:focus,
+.site-wrapper a:hover {
   color: #fff;
 }
 
 /* Custom default button */
-.btn-default,
-.btn-default:hover,
-.btn-default:focus {
+.site-wrapper .btn-default,
+.site-wrapper .btn-default:hover,
+.site-wrapper .btn-default:focus {
   color: #333;
   text-shadow: none; /* Prevent inheritence from `body` */
   background-color: #fff;
@@ -30,13 +30,14 @@ body {
   background-color: #333;
 }
 body {
-  color: #fff;
-  text-align: center;
-  text-shadow: 0 1px 3px rgba(0,0,0,.5);
 }
 
 /* Extra markup and styles for table-esque vertical and horizontal centering */
 .site-wrapper {
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0,0,0,.5);
+
   display: table;
   width: 100%;
   height: 100%; /* For at least Firefox */

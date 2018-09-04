@@ -86,13 +86,40 @@ if (isset($_FILES['file'])) {
 
 		<div class="mastfoot">
 			<div class="inner">
-				<p><a href="https://github.com/sqlsplit/sqlsplit">source code</a> | <a href="http://sqlsplit.uservoice.com">feedback</a></p>
+				<p>
+                <a href="https://github.com/sqlsplit/sqlsplit">source code</a> |
+                <a href="http://sqlsplit.uservoice.com">feedback</a> |
+                <a href="#" data-toggle="modal" data-target="#privacy">privacy</a>
+                </p>
 			</div>
 		</div>
 
 	</div>
 
 </div>
+</div>
+
+<div id="privacy" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">
+                    Privacy
+                </h4>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>All files was removed immediately after they are processed and sent to user</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="lib/jquery-1.11.1.min.js" type="text/javascript"></script>
